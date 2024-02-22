@@ -107,7 +107,6 @@ def run_socket_server(host: tuple[str, int]) -> None:
 
             with open('./storage/data.json', 'w') as fd:
                 json.dump(existing_data, fd, indent=4)
-        raise KeyboardInterrupt
     except Exception as e:
         logger.error(f"Error: {e}")
     finally:
