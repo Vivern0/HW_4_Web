@@ -81,6 +81,19 @@ def run_server(
 
 
 def run_socket_server(host: tuple[str, int]) -> None:
+    if not Path('./storage/data.json').exists():
+        storage_path = Path('./storage')
+        storage_path.mkdir(parents=True, exist_ok=True)
+        json_path = storage_path.joinpath('data.json')
+        json_path.touch(exist_ok=True)
+
+    with open('./storage/data.json', 'r+') as fd:
+        try:
+            existing_data = json.load(fd)
+        except Exception as e:
+            logger.error(f'Cannot read from file: {e}')
+            existing_data = {}
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(host)
     logger.info(f"Socket server started on {host[0]}:{host[1]}")
@@ -93,20 +106,14 @@ def run_socket_server(host: tuple[str, int]) -> None:
             logger.info(f'Write data to json: {data_dict}')
 
             ctime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-
-            if Path('./storage/data.json').exists():
-                with open('./storage/data.json', 'r+') as fd:
-                    try:
-                        existing_data = json.load(fd)
-                    except json.JSONDecodeError:
-                        existing_data = {}
-            else:
-                existing_data = {}
             
             existing_data[ctime] = data_dict
 
-            with open('./storage/data.json', 'w') as fd:
-                json.dump(existing_data, fd, indent=4)
+            try:
+                with open('./storage/data.json', 'w') as fd:
+                    json.dump(existing_data, fd, indent=4)
+            except Exception as e:
+                logger.error(f'Cannot write to file: {e}')
     except Exception as e:
         logger.error(f"Error: {e}")
     finally:
