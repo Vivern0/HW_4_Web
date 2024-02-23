@@ -140,3 +140,6 @@ if __name__ == '__main__':
 
     http_server.join()
     socket_server.join()
+
+#docker build -t host_test .
+#docker run -it -v D:/Git_repository/HW_4_Web/storage/data.json:/app/storage/data.json -p 3000:3000 -p 5000:5000 --name host_test1 host_test
